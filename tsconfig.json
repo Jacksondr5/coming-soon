@@ -17,7 +17,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "noEmit": true,
     "incremental": true,
     "plugins": [
@@ -38,7 +38,8 @@
   "include": [
     "src",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
