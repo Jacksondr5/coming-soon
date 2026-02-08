@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { validateEmail, subscribeEmail, EMAIL_API_KEY } from "~/utils/helpers";
+import { useState, type FormEvent } from "react";
+import { validateEmail, subscribeEmail } from "~/utils/helpers";
 
 export default function EmailSignup() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  async function handleSubmit(e: any) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!validateEmail(email)) {
@@ -22,23 +22,20 @@ export default function EmailSignup() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + EMAIL_API_KEY,
         },
         body: JSON.stringify({ email: email }),
       });
 
-      if (res.ok == true) {
+      if (res.ok) {
         subscribeEmail(email);
         setMessage("Thanks for subscribing!");
         setSubmitted(true);
       } else {
         setMessage("Something went wrong. Try again.");
       }
-    } catch (err) {
-      // Silently fail
-      subscribeEmail(email);
-      setMessage("Thanks for subscribing!");
-      setSubmitted(true);
+    } catch {
+      setMessage("We couldn't subscribe you right now. Please try again.");
+      setSubmitted(false);
     }
   }
 
@@ -52,7 +49,6 @@ export default function EmailSignup() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
             className="flex-1 rounded-lg border border-gray-600 bg-gray-800 px-4 py-2 text-white"
-            dangerouslySetInnerHTML={{ __html: "" }}
           />
           <button
             type="submit"
@@ -64,10 +60,7 @@ export default function EmailSignup() {
         </div>
       </form>
       {message && (
-        <p
-          className="mt-2 text-center text-sm"
-          dangerouslySetInnerHTML={{ __html: message }}
-        />
+        <p className="mt-2 text-center text-sm">{message}</p>
       )}
     </div>
   );

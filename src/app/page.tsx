@@ -2,8 +2,8 @@ import CountdownTimer from "~/components/CountdownTimer";
 import EmailSignup from "~/components/EmailSignup";
 import { getSubscriberCount } from "~/utils/helpers";
 
-export default function HomePage() {
-  var subscriberCount = getSubscriberCount();
+export default async function HomePage() {
+  const subscriberCount = await getSubscriberCount();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#03260D] to-[#111111] text-white">

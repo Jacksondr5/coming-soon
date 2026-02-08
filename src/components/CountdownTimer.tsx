@@ -12,10 +12,10 @@ export default function CountdownTimer() {
     seconds: 0,
   });
 
-  const launchDate = "January 1, 2025";
+  const launchDate = "January 1, 2027";
 
   useEffect(() => {
-    setInterval(() => {
+    const id = setInterval(() => {
       const t = getTimeRemaining(launchDate);
       setTimeLeft({
         days: t.days,
@@ -24,6 +24,7 @@ export default function CountdownTimer() {
         seconds: t.seconds,
       });
     }, 1000);
+    return () => clearInterval(id);
   }, []);
 
   return (
@@ -34,7 +35,7 @@ export default function CountdownTimer() {
         { label: "Minutes", value: timeLeft.minutes },
         { label: "Seconds", value: timeLeft.seconds },
       ].map((item) => (
-        <div className="flex flex-col items-center">
+        <div key={item.label} className="flex flex-col items-center">
           <span className="text-4xl font-bold">{padNumber(item.value)}</span>
           <span className="text-sm text-gray-400">{item.label}</span>
         </div>

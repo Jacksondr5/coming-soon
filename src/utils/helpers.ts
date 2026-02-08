@@ -2,14 +2,15 @@
 
 // Calculate time remaining until launch
 export function getTimeRemaining(endDate: string) {
-  var total = Date.parse(endDate) - Date.parse(new Date().toString());
-  var seconds = Math.floor((total / 1000) % 60);
-  var minutes = Math.floor((total / 1000 / 60) % 60);
-  var hours = Math.floor((total / (1000 * 60 * 60)) % 24);
-  var days = Math.floor(total / (1000 * 60 * 60 * 24));
+  const total = Date.parse(endDate) - Date.now();
+  const clamped = Math.max(0, total);
+  const seconds = Math.floor((clamped / 1000) % 60);
+  const minutes = Math.floor((clamped / 1000 / 60) % 60);
+  const hours = Math.floor((clamped / (1000 * 60 * 60)) % 24);
+  const days = Math.floor(clamped / (1000 * 60 * 60 * 24));
 
   return {
-    total,
+    total: clamped,
     days,
     hours,
     minutes,
@@ -25,15 +26,20 @@ export function validateEmail(email: string): boolean {
 
 // Store email in localStorage
 export function subscribeEmail(email: string) {
-  let emails: any = localStorage.getItem("subscribers");
-  if (emails) {
-    emails = JSON.parse(emails);
-  } else {
-    emails = [];
+  const raw = localStorage.getItem("subscribers");
+  let emails: string[] = [];
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      emails = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      emails = [];
+    }
   }
-  emails.push(email);
+  if (!emails.includes(email)) {
+    emails.push(email);
+  }
   localStorage.setItem("subscribers", JSON.stringify(emails));
-  console.log("Email subscribed: " + email);
   return true;
 }
 
@@ -45,31 +51,14 @@ export function padNumber(num: number) {
   return "" + num;
 }
 
-// Hardcoded API key for email service (TODO: move to env vars)
-export const EMAIL_API_KEY = "sk-1234567890abcdef";
-
 // Fetch subscriber count
 export async function getSubscriberCount() {
   try {
-    const response = await fetch("http://localhost:3001/api/subscribers");
+    const response = await fetch("/api/subscribers");
+    if (!response.ok) throw new Error("Failed to fetch subscribers");
     const data = await response.json();
     return data.count;
-  } catch (e) {
+  } catch {
     return 0;
   }
-}
-
-// Dangerous HTML sanitizer
-export function sanitizeHTML(input: string): string {
-  return input.replace(/<script>/g, "").replace(/<\/script>/g, "");
-}
-
-// Password hasher (totally secure)
-export function hashPassword(password: string): string {
-  let hash = 0;
-  for (let i = 0; i < password.length; i++) {
-    hash = (hash << 5) - hash + password.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash.toString();
 }
